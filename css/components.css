@@ -1,0 +1,896 @@
+/* ==========================================================================
+   NaebBet — css/components.css
+   Универсальные UI-компоненты. Mobile-first, тёмная тема, неон (фиолетовый/золото).
+   Без hover-зависимостей: все состояния отзываются на :active и :focus-visible.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   0. Токены (переменные). Значения по умолчанию — можно переопределить в base.css
+   -------------------------------------------------------------------------- */
+:root {
+  --nb-bg: #0b0714;
+  --nb-bg-2: #120c22;
+  --nb-surface: #1a1230;
+  --nb-surface-2: #231845;
+  --nb-surface-3: #2d205a;
+  --nb-border: #3a2a6b;
+  --nb-text: #f1ecff;
+  --nb-text-dim: #a99fcb;
+  --nb-text-mute: #6f6595;
+
+  --nb-purple: #9b5cff;
+  --nb-purple-2: #7a3df0;
+  --nb-purple-glow: rgba(155, 92, 255, 0.55);
+  --nb-gold: #ffd24a;
+  --nb-gold-2: #ffb300;
+  --nb-gold-glow: rgba(255, 210, 74, 0.6);
+  --nb-green: #36e08a;
+  --nb-green-glow: rgba(54, 224, 138, 0.45);
+  --nb-red: #ff4d6d;
+  --nb-red-glow: rgba(255, 77, 109, 0.45);
+  --nb-blue: #4db8ff;
+  --nb-blue-glow: rgba(77, 184, 255, 0.45);
+
+  --nb-radius-sm: 8px;
+  --nb-radius: 14px;
+  --nb-radius-lg: 20px;
+  --nb-radius-pill: 999px;
+
+  --nb-tap: 44px;               /* минимальный размер цели касания */
+  --nb-gap: 12px;
+  --nb-font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --nb-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --nb-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  --nb-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --nb-safe-top: env(safe-area-inset-top, 0px);
+  --nb-safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* --------------------------------------------------------------------------
+   1. Базовые правила для интерактивных элементов
+   -------------------------------------------------------------------------- */
+.nb-btn,
+.nb-chip,
+.nb-tab,
+.nb-switch,
+.nb-accordion__head,
+.nb-card--clickable,
+.nb-game-card {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.nb-btn:focus-visible,
+.nb-chip:focus-visible,
+.nb-tab:focus-visible,
+.nb-input:focus-visible,
+.nb-switch input:focus-visible + .nb-switch__track,
+.nb-accordion__head:focus-visible,
+.nb-game-card:focus-visible {
+  outline: 2px solid var(--nb-gold);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   2. Кнопки
+   -------------------------------------------------------------------------- */
+.nb-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--nb-tap);
+  min-width: var(--nb-tap);
+  padding: 0 20px;
+  border: 1px solid transparent;
+  border-radius: var(--nb-radius);
+  font-family: var(--nb-font);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--nb-text);
+  background: var(--nb-surface-2);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.12s var(--nb-ease), box-shadow 0.2s, filter 0.2s, background 0.2s;
+}
+
+.nb-btn:active:not(:disabled):not(.is-disabled) {
+  transform: scale(0.96);
+  filter: brightness(1.15);
+}
+
+/* Основная — фиолетовый неон */
+.nb-btn--primary {
+  background: linear-gradient(180deg, var(--nb-purple) 0%, var(--nb-purple-2) 100%);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 16px var(--nb-purple-glow), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Золотая — для главных действий (крутить, раздать) */
+.nb-btn--gold {
+  background: linear-gradient(180deg, var(--nb-gold) 0%, var(--nb-gold-2) 100%);
+  color: #2a1a00;
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 18px var(--nb-gold-glow), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* Вторичная — контурная */
+.nb-btn--secondary {
+  background: transparent;
+  border-color: var(--nb-purple);
+  color: var(--nb-text);
+  box-shadow: inset 0 0 10px rgba(155, 92, 255, 0.15);
+}
+.nb-btn--secondary:active:not(:disabled):not(.is-disabled) {
+  background: rgba(155, 92, 255, 0.18);
+}
+
+/* Опасная */
+.nb-btn--danger {
+  background: linear-gradient(180deg, #ff6b86 0%, #e0264b 100%);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 14px var(--nb-red-glow);
+}
+
+/* Прозрачная (иконочная) */
+.nb-btn--ghost {
+  background: transparent;
+  color: var(--nb-text-dim);
+}
+
+/* Отключённая */
+.nb-btn:disabled,
+.nb-btn.is-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.6);
+  box-shadow: none;
+  pointer-events: none;
+}
+
+/* Размеры */
+.nb-btn--sm { min-height: var(--nb-tap); padding: 0 14px; font-size: 14px; border-radius: var(--nb-radius-sm); }
+.nb-btn--lg { min-height: 56px; padding: 0 28px; font-size: 18px; border-radius: var(--nb-radius-lg); }
+.nb-btn--xl { min-height: 68px; padding: 0 32px; font-size: 22px; border-radius: var(--nb-radius-lg); text-transform: uppercase; }
+.nb-btn--block { display: flex; width: 100%; }
+.nb-btn--icon { padding: 0; width: var(--nb-tap); }
+
+/* Состояние загрузки / пульсация главной кнопки */
+.nb-btn--pulse { animation: nb-pulse 1.8s ease-in-out infinite; }
+
+/* Группа кнопок */
+.nb-btn-group { display: flex; gap: 8px; }
+.nb-btn-group > .nb-btn { flex: 1 1 0; }
+
+/* --------------------------------------------------------------------------
+   3. Карточки
+   -------------------------------------------------------------------------- */
+.nb-card {
+  background: linear-gradient(160deg, var(--nb-surface-2) 0%, var(--nb-surface) 100%);
+  border: 1px solid var(--nb-border);
+  border-radius: var(--nb-radius-lg);
+  padding: 16px;
+  box-shadow: var(--nb-shadow);
+  color: var(--nb-text);
+}
+.nb-card--clickable:active { transform: scale(0.98); transition: transform 0.1s; }
+.nb-card--glow { border-color: var(--nb-purple); box-shadow: 0 0 18px var(--nb-purple-glow), var(--nb-shadow); }
+.nb-card--gold { border-color: var(--nb-gold); box-shadow: 0 0 20px var(--nb-gold-glow), var(--nb-shadow); }
+.nb-card__title { margin: 0 0 8px; font-size: 18px; font-weight: 800; }
+.nb-card__subtitle { margin: 0 0 12px; font-size: 14px; color: var(--nb-text-dim); }
+.nb-card__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; }
+.nb-card__row + .nb-card__row { border-top: 1px solid rgba(255, 255, 255, 0.06); }
+.nb-card__label { color: var(--nb-text-dim); font-size: 14px; }
+.nb-card__value { font-weight: 800; font-variant-numeric: tabular-nums; }
+
+/* --------------------------------------------------------------------------
+   4. Бейджи
+   -------------------------------------------------------------------------- */
+.nb-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: var(--nb-radius-pill);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--nb-text);
+  background: var(--nb-surface-3);
+  border: 1px solid var(--nb-border);
+}
+.nb-badge--purple { background: rgba(155, 92, 255, 0.2); border-color: var(--nb-purple); color: #d9c4ff; }
+.nb-badge--gold { background: rgba(255, 210, 74, 0.18); border-color: var(--nb-gold); color: var(--nb-gold); }
+.nb-badge--green { background: rgba(54, 224, 138, 0.16); border-color: var(--nb-green); color: var(--nb-green); }
+.nb-badge--red { background: rgba(255, 77, 109, 0.16); border-color: var(--nb-red); color: var(--nb-red); }
+.nb-badge--blue { background: rgba(77, 184, 255, 0.16); border-color: var(--nb-blue); color: var(--nb-blue); }
+.nb-badge--new { animation: nb-pulse 1.6s ease-in-out infinite; }
+
+/* --------------------------------------------------------------------------
+   5. Прогресс-бары
+   -------------------------------------------------------------------------- */
+.nb-progress {
+  position: relative;
+  width: 100%;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--nb-border);
+  border-radius: var(--nb-radius-pill);
+  overflow: hidden;
+}
+.nb-progress__bar {
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--nb-purple-2), var(--nb-purple));
+  box-shadow: 0 0 10px var(--nb-purple-glow);
+  transition: width 0.5s var(--nb-ease);
+}
+.nb-progress--gold .nb-progress__bar { background: linear-gradient(90deg, var(--nb-gold-2), var(--nb-gold)); box-shadow: 0 0 10px var(--nb-gold-glow); }
+.nb-progress--green .nb-progress__bar { background: linear-gradient(90deg, #1fb86c, var(--nb-green)); box-shadow: 0 0 10px var(--nb-green-glow); }
+.nb-progress--red .nb-progress__bar { background: linear-gradient(90deg, #d61f46, var(--nb-red)); box-shadow: 0 0 10px var(--nb-red-glow); }
+.nb-progress--lg { height: 20px; }
+.nb-progress--striped .nb-progress__bar {
+  background-image: linear-gradient(45deg, rgba(255,255,255,0.18) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.18) 75%, transparent 75%);
+  background-size: 24px 24px;
+  animation: nb-stripes 1s linear infinite;
+}
+.nb-progress__label {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* --------------------------------------------------------------------------
+   6. Переключатели (switch)
+   Разметка: <label class="nb-switch"><input type="checkbox"><span class="nb-switch__track"></span><span class="nb-switch__text">…</span></label>
+   -------------------------------------------------------------------------- */
+.nb-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--nb-tap);
+  cursor: pointer;
+  color: var(--nb-text);
+  font-size: 16px;
+}
+.nb-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+.nb-switch__track {
+  position: relative;
+  flex: 0 0 auto;
+  width: 52px;
+  height: 30px;
+  border-radius: var(--nb-radius-pill);
+  background: var(--nb-surface-3);
+  border: 1px solid var(--nb-border);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.nb-switch__track::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #cfc6ee;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s var(--nb-ease), background 0.2s;
+}
+.nb-switch input:checked + .nb-switch__track {
+  background: var(--nb-purple-2);
+  border-color: var(--nb-purple);
+  box-shadow: 0 0 12px var(--nb-purple-glow);
+}
+.nb-switch input:checked + .nb-switch__track::after {
+  transform: translateX(22px);
+  background: var(--nb-gold);
+}
+.nb-switch input:disabled + .nb-switch__track { opacity: 0.4; }
+.nb-switch__text { flex: 1 1 auto; }
+
+/* --------------------------------------------------------------------------
+   7. Поля ввода
+   -------------------------------------------------------------------------- */
+.nb-field { display: flex; flex-direction: column; gap: 6px; }
+.nb-field__label { font-size: 13px; font-weight: 700; color: var(--nb-text-dim); }
+.nb-field__hint { font-size: 12px; color: var(--nb-text-mute); }
+.nb-field__error { font-size: 12px; color: var(--nb-red); }
+
+.nb-input,
+.nb-select,
+.nb-textarea {
+  width: 100%;
+  min-height: var(--nb-tap);
+  padding: 10px 14px;
+  border-radius: var(--nb-radius);
+  border: 1px solid var(--nb-border);
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--nb-text);
+  font-family: var(--nb-font);
+  font-size: 16px; /* 16px — чтобы iOS не зумил поле при фокусе */
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.nb-textarea { min-height: 96px; resize: vertical; }
+.nb-input::placeholder,
+.nb-textarea::placeholder { color: var(--nb-text-mute); }
+.nb-input:focus,
+.nb-select:focus,
+.nb-textarea:focus {
+  border-color: var(--nb-purple);
+  box-shadow: 0 0 0 3px rgba(155, 92, 255, 0.25);
+}
+.nb-input--error { border-color: var(--nb-red); box-shadow: 0 0 0 3px rgba(255, 77, 109, 0.2); }
+.nb-input--number { font-family: var(--nb-font-mono); font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; }
+.nb-input:disabled,
+.nb-select:disabled,
+.nb-textarea:disabled { opacity: 0.45; }
+.nb-select {
+  padding-right: 40px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--nb-text-dim) 50%), linear-gradient(135deg, var(--nb-text-dim) 50%, transparent 50%);
+  background-position: calc(100% - 20px) 50%, calc(100% - 14px) 50%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+.nb-input-group { display: flex; align-items: stretch; gap: 8px; }
+.nb-input-group > .nb-input { flex: 1 1 auto; min-width: 0; }
+
+/* --------------------------------------------------------------------------
+   8. Модальное окно
+   -------------------------------------------------------------------------- */
+.nb-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: calc(16px + var(--nb-safe-top)) 12px calc(12px + var(--nb-safe-bottom));
+  background: rgba(5, 2, 12, 0.78);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  animation: nb-fade-in 0.2s ease-out both;
+}
+.nb-modal-overlay.is-closing { animation: nb-fade-out 0.18s ease-in both; }
+
+.nb-modal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 480px;
+  max-height: 88vh;
+  max-height: 88dvh;
+  background: linear-gradient(170deg, var(--nb-surface-2) 0%, var(--nb-bg-2) 100%);
+  border: 1px solid var(--nb-purple);
+  border-radius: var(--nb-radius-lg);
+  box-shadow: 0 0 28px var(--nb-purple-glow), var(--nb-shadow);
+  color: var(--nb-text);
+  overflow: hidden;
+  animation: nb-slide-up 0.28s var(--nb-ease) both;
+}
+.nb-modal-overlay.is-closing .nb-modal { animation: nb-slide-down 0.18s ease-in both; }
+
+.nb-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+.nb-modal__title { margin: 0; font-size: 20px; font-weight: 800; color: var(--nb-gold); }
+.nb-modal__close {
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: var(--nb-tap); height: var(--nb-tap);
+  border: 0; border-radius: 50%;
+  background: transparent; color: var(--nb-text-dim);
+  font-size: 22px; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.nb-modal__close:active { background: rgba(255, 255, 255, 0.1); }
+.nb-modal__body {
+  flex: 1 1 auto;
+  padding: 16px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.nb-modal__footer {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+.nb-modal__footer > .nb-btn { flex: 1 1 0; }
+
+/* На широких экранах — по центру */
+@media (min-width: 600px) {
+  .nb-modal-overlay { align-items: center; }
+}
+
+/* --------------------------------------------------------------------------
+   9. Toast
+   -------------------------------------------------------------------------- */
+.nb-toast-container {
+  position: fixed;
+  top: calc(12px + var(--nb-safe-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: calc(100% - 24px);
+  max-width: 420px;
+  pointer-events: none;
+}
+.nb-toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: var(--nb-tap);
+  padding: 10px 16px;
+  box-sizing: border-box;
+  border-radius: var(--nb-radius);
+  border: 1px solid var(--nb-border);
+  background: rgba(26, 18, 48, 0.96);
+  color: var(--nb-text);
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: var(--nb-shadow);
+  pointer-events: auto;
+  animation: nb-toast-in 0.3s var(--nb-ease) both;
+}
+.nb-toast.is-closing { animation: nb-toast-out 0.25s ease-in both; }
+.nb-toast__icon { flex: 0 0 auto; font-size: 20px; }
+.nb-toast__text { flex: 1 1 auto; min-width: 0; word-break: break-word; }
+
+.nb-toast--success { border-color: var(--nb-green); box-shadow: 0 0 16px var(--nb-green-glow), var(--nb-shadow); }
+.nb-toast--error { border-color: var(--nb-red); box-shadow: 0 0 16px var(--nb-red-glow), var(--nb-shadow); }
+.nb-toast--info { border-color: var(--nb-blue); box-shadow: 0 0 16px var(--nb-blue-glow), var(--nb-shadow); }
+.nb-toast--bigwin {
+  border-color: var(--nb-gold);
+  background: linear-gradient(135deg, #3a2a00 0%, #1a1230 100%);
+  color: var(--nb-gold);
+  font-size: 18px;
+  font-weight: 900;
+  justify-content: center;
+  text-align: center;
+  animation: nb-toast-in 0.3s var(--nb-ease) both, nb-gold-glow 1.2s ease-in-out infinite;
+}
+
+/* --------------------------------------------------------------------------
+   10. Селектор ставки (NB.UI.createBetControl)
+   Разметка: .nb-bet > .nb-bet__display + .nb-bet__chips + .nb-bet__actions
+   -------------------------------------------------------------------------- */
+.nb-bet {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--nb-border);
+  border-radius: var(--nb-radius-lg);
+}
+.nb-bet.is-locked { opacity: 0.55; pointer-events: none; }
+
+.nb-bet__display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.nb-bet__label { font-size: 13px; font-weight: 700; color: var(--nb-text-dim); text-transform: uppercase; letter-spacing: 0.06em; }
+.nb-bet__value {
+  font-family: var(--nb-font-mono);
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--nb-gold);
+  text-shadow: 0 0 10px var(--nb-gold-glow);
+  font-variant-numeric: tabular-nums;
+}
+
+.nb-bet__chips {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+.nb-chip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--nb-tap);
+  padding: 0 4px;
+  border-radius: 50%;
+  aspect-ratio: 1 / 1;
+  max-height: 64px;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 64px;
+  border: 3px dashed rgba(255, 255, 255, 0.55);
+  background: radial-gradient(circle at 30% 30%, var(--nb-purple) 0%, var(--nb-purple-2) 70%);
+  color: #fff;
+  font-family: var(--nb-font);
+  font-size: 14px;
+  font-weight: 900;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5), inset 0 0 0 3px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  transition: transform 0.12s var(--nb-ease), box-shadow 0.2s;
+}
+.nb-chip:nth-child(1) { background: radial-gradient(circle at 30% 30%, #5ab8ff 0%, #1f6fd6 70%); }
+.nb-chip:nth-child(2) { background: radial-gradient(circle at 30% 30%, #4be39a 0%, #14925a 70%); }
+.nb-chip:nth-child(3) { background: radial-gradient(circle at 30% 30%, #ff6b86 0%, #c8203f 70%); }
+.nb-chip:nth-child(4) { background: radial-gradient(circle at 30% 30%, #b47bff 0%, #6d2fe0 70%); }
+.nb-chip:nth-child(5) { background: radial-gradient(circle at 30% 30%, var(--nb-gold) 0%, var(--nb-gold-2) 70%); color: #2a1a00; }
+.nb-chip:active { transform: scale(0.9); }
+.nb-chip.is-active {
+  transform: translateY(-3px) scale(1.06);
+  box-shadow: 0 0 14px var(--nb-gold-glow), 0 4px 10px rgba(0, 0, 0, 0.55), inset 0 0 0 3px rgba(0, 0, 0, 0.18);
+  border-color: var(--nb-gold);
+}
+.nb-chip:disabled { opacity: 0.35; pointer-events: none; }
+
+.nb-bet__actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.nb-bet__btn {
+  min-height: var(--nb-tap);
+  border-radius: var(--nb-radius);
+  border: 1px solid var(--nb-purple);
+  background: rgba(155, 92, 255, 0.12);
+  color: var(--nb-text);
+  font-family: var(--nb-font);
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: transform 0.1s, background 0.2s;
+}
+.nb-bet__btn:active { transform: scale(0.95); background: rgba(155, 92, 255, 0.3); }
+.nb-bet__btn--max { border-color: var(--nb-gold); color: var(--nb-gold); background: rgba(255, 210, 74, 0.1); }
+.nb-bet__btn--max:active { background: rgba(255, 210, 74, 0.28); }
+.nb-bet__btn:disabled { opacity: 0.35; pointer-events: none; }
+
+/* --------------------------------------------------------------------------
+   11. Табы
+   -------------------------------------------------------------------------- */
+.nb-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--nb-border);
+  border-radius: var(--nb-radius);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.nb-tabs::-webkit-scrollbar { display: none; }
+.nb-tab {
+  flex: 1 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: var(--nb-tap);
+  padding: 0 16px;
+  border: 0;
+  border-radius: calc(var(--nb-radius) - 4px);
+  background: transparent;
+  color: var(--nb-text-dim);
+  font-family: var(--nb-font);
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.nb-tab:active { background: rgba(155, 92, 255, 0.15); }
+.nb-tab.is-active {
+  background: linear-gradient(180deg, var(--nb-purple) 0%, var(--nb-purple-2) 100%);
+  color: #fff;
+  box-shadow: 0 0 12px var(--nb-purple-glow);
+}
+.nb-tab-panel { display: none; padding-top: 12px; }
+.nb-tab-panel.is-active { display: block; animation: nb-fade-in 0.25s ease-out both; }
+
+/* --------------------------------------------------------------------------
+   12. Аккордеон (правила игр)
+   Разметка: .nb-accordion > .nb-accordion__item > .nb-accordion__head + .nb-accordion__body
+   Открытый пункт: .is-open на .nb-accordion__item
+   -------------------------------------------------------------------------- */
+.nb-accordion { display: flex; flex-direction: column; gap: 8px; }
+.nb-accordion__item {
+  background: var(--nb-surface);
+  border: 1px solid var(--nb-border);
+  border-radius: var(--nb-radius);
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.nb-accordion__item.is-open { border-color: var(--nb-purple); box-shadow: 0 0 12px rgba(155, 92, 255, 0.25); }
+.nb-accordion__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: var(--nb-tap);
+  padding: 10px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--nb-text);
+  font-family: var(--nb-font);
+  font-size: 16px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+.nb-accordion__head:active { background: rgba(155, 92, 255, 0.12); }
+.nb-accordion__head::after {
+  content: "";
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--nb-gold);
+  border-bottom: 2px solid var(--nb-gold);
+  transform: rotate(45deg);
+  transition: transform 0.25s var(--nb-ease);
+}
+.nb-accordion__item.is-open > .nb-accordion__head::after { transform: rotate(-135deg); }
+.nb-accordion__body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s var(--nb-ease);
+}
+.nb-accordion__item.is-open > .nb-accordion__body { grid-template-rows: 1fr; }
+.nb-accordion__content {
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 14px;
+  color: var(--nb-text-dim);
+  font-size: 15px;
+  line-height: 1.55;
+}
+.nb-accordion__item.is-open .nb-accordion__content { padding-bottom: 14px; }
+.nb-accordion__content ol,
+.nb-accordion__content ul { margin: 0; padding-left: 20px; }
+.nb-accordion__content li + li { margin-top: 6px; }
+
+/* --------------------------------------------------------------------------
+   13. Таблицы
+   Оборачивайте в .nb-table-wrap для горизонтальной прокрутки на узких экранах
+   -------------------------------------------------------------------------- */
+.nb-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--nb-border);
+  border-radius: var(--nb-radius);
+  background: var(--nb-surface);
+}
+.nb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  color: var(--nb-text);
+}
+.nb-table th,
+.nb-table td {
+  padding: 12px 12px;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.nb-table th {
+  position: sticky;
+  top: 0;
+  background: var(--nb-surface-3);
+  color: var(--nb-text-dim);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.nb-table tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.025); }
+.nb-table tbody tr:last-child td { border-bottom: 0; }
+.nb-table .is-num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--nb-font-mono); }
+.nb-table .is-win { color: var(--nb-green); font-weight: 800; }
+.nb-table .is-lose { color: var(--nb-red); font-weight: 800; }
+.nb-table .is-gold { color: var(--nb-gold); font-weight: 800; }
+
+/* --------------------------------------------------------------------------
+   14. Сетка карточек игр
+   -------------------------------------------------------------------------- */
+.nb-games-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--nb-gap);
+}
+@media (min-width: 560px) {
+  .nb-games-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.nb-game-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-height: 150px;
+  padding: 14px 10px 12px;
+  box-sizing: border-box;
+  text-align: center;
+  color: var(--nb-text);
+  font-family: var(--nb-font);
+  background: linear-gradient(160deg, var(--nb-surface-3) 0%, var(--nb-surface) 100%);
+  border: 1px solid var(--nb-border);
+  border-radius: var(--nb-radius-lg);
+  box-shadow: var(--nb-shadow);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.12s var(--nb-ease), border-color 0.2s, box-shadow 0.2s;
+  animation: nb-pop-in 0.4s var(--nb-ease) both;
+}
+.nb-game-card:nth-child(2) { animation-delay: 0.05s; }
+.nb-game-card:nth-child(3) { animation-delay: 0.1s; }
+.nb-game-card:nth-child(4) { animation-delay: 0.15s; }
+.nb-game-card:nth-child(5) { animation-delay: 0.2s; }
+.nb-game-card:nth-child(6) { animation-delay: 0.25s; }
+.nb-game-card:active {
+  transform: scale(0.95);
+  border-color: var(--nb-gold);
+  box-shadow: 0 0 18px var(--nb-gold-glow);
+}
+.nb-game-card::before {
+  content: "";
+  position: absolute;
+  top: -40%;
+  left: 50%;
+  width: 120%;
+  height: 80%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, var(--nb-purple-glow) 0%, transparent 70%);
+  opacity: 0.55;
+  pointer-events: none;
+}
+.nb-game-card__icon {
+  position: relative;
+  font-size: 44px;
+  line-height: 1;
+  filter: drop-shadow(0 0 8px var(--nb-purple-glow));
+}
+.nb-game-card__name { position: relative; font-size: 16px; font-weight: 800; }
+.nb-game-card__desc { position: relative; font-size: 12px; color: var(--nb-text-dim); line-height: 1.3; }
+.nb-game-card__meta { position: relative; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+.nb-game-card__badge { position: absolute; top: 8px; right: 8px; z-index: 1; }
+.nb-game-card.is-locked { opacity: 0.5; filter: grayscale(0.7); pointer-events: none; }
+
+/* --------------------------------------------------------------------------
+   15. Вспомогательные классы для выигрыша / проигрыша
+   -------------------------------------------------------------------------- */
+.nb-win-glow { animation: nb-gold-glow 1.2s ease-in-out 3; }
+.nb-win-glow--loop { animation: nb-gold-glow 1.2s ease-in-out infinite; }
+.nb-text-gold { color: var(--nb-gold); text-shadow: 0 0 10px var(--nb-gold-glow); }
+.nb-text-green { color: var(--nb-green); }
+.nb-text-red { color: var(--nb-red); }
+.nb-text-dim { color: var(--nb-text-dim); }
+.nb-shake { animation: nb-shake 0.4s ease-in-out; }
+.nb-pulse { animation: nb-pulse 1.8s ease-in-out infinite; }
+.nb-fade-in { animation: nb-fade-in 0.3s ease-out both; }
+.nb-pop-in { animation: nb-pop-in 0.4s var(--nb-ease) both; }
+.nb-slide-up { animation: nb-slide-up 0.35s var(--nb-ease) both; }
+.nb-float { animation: nb-float 3s ease-in-out infinite; }
+.nb-hidden { display: none !important; }
+
+/* --------------------------------------------------------------------------
+   16. Анимации (keyframes)
+   -------------------------------------------------------------------------- */
+@keyframes nb-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes nb-fade-out { from { opacity: 1; } to { opacity: 0; } }
+
+@keyframes nb-slide-up {
+  from { opacity: 0; transform: translateY(40px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes nb-slide-down {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(40px) scale(0.98); }
+}
+
+@keyframes nb-pop-in {
+  0%   { opacity: 0; transform: scale(0.8); }
+  70%  { opacity: 1; transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes nb-toast-in {
+  from { opacity: 0; transform: translateY(-24px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes nb-toast-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(-20px) scale(0.95); }
+}
+
+/* Пульсация неоном */
+@keyframes nb-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 10px var(--nb-purple-glow); }
+  50%      { transform: scale(1.04); box-shadow: 0 0 24px var(--nb-purple-glow); }
+}
+
+/* Золотое свечение выигрыша */
+@keyframes nb-gold-glow {
+  0%, 100% { box-shadow: 0 0 8px var(--nb-gold-glow), 0 0 0 rgba(255, 210, 74, 0); filter: brightness(1); }
+  50%      { box-shadow: 0 0 28px var(--nb-gold), 0 0 56px var(--nb-gold-glow); filter: brightness(1.2); }
+}
+
+@keyframes nb-stripes { from { background-position: 0 0; } to { background-position: 24px 0; } }
+
+@keyframes nb-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
+@keyframes nb-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+
+/* --------------------------------------------------------------------------
+   17. Уважение к настройке «уменьшить движение»
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .nb-btn,
+  .nb-chip,
+  .nb-tab,
+  .nb-game-card,
+  .nb-modal,
+  .nb-modal-overlay,
+  .nb-toast,
+  .nb-progress__bar,
+  .nb-accordion__body,
+  .nb-switch__track,
+  .nb-switch__track::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .nb-pulse,
+  .nb-btn--pulse,
+  .nb-badge--new,
+  .nb-float,
+  .nb-win-glow--loop { animation: none !important; }
+}
