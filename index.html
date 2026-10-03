@@ -56,10 +56,10 @@
   </div>
 
   <!-- Приложение -->
-  <div id="app" class="app" aria-hidden="true">
+  <div id="app" class="app nb-app has-nav" aria-hidden="true">
 
     <!-- Шапка: баланс, уровень с полоской XP, звук -->
-    <header id="header" class="header">
+    <header id="header" class="header nb-header">
       <div class="header__balance" id="header-balance-wrap">
         <span class="header__coin" aria-hidden="true">🪙</span>
         <div class="header__balance-text">
@@ -83,11 +83,11 @@
       </button>
     </header>
 
-    <!-- Основной контейнер экранов -->
-    <main id="screen" class="screen" tabindex="-1"></main>
+    <!-- Основной контейнер экранов: именно он прокручивается (см. #screen в css/base.css) -->
+    <main id="screen" class="screen nb-screen" tabindex="-1"></main>
 
-    <!-- Нижняя навигация -->
-    <nav id="nav" class="nav" aria-label="Основная навигация">
+    <!-- Нижняя навигация: плавающая (position:absolute), экран резервирует под неё место -->
+    <nav id="nav" class="nav nb-nav" aria-label="Основная навигация">
       <button type="button" class="nav__item is-active" data-screen="lobby" aria-label="Лобби">
         <span class="nav__icon" aria-hidden="true">🏠</span>
         <span class="nav__text">Лобби</span>
@@ -133,8 +133,6 @@
   <script src="js/core/levels.js"></script>
   <script src="js/core/achievements.js"></script>
   <script src="js/core/bonuses.js"></script>
-  <script src="js/core/router.js"></script>
-  <script src="js/core/games.js"></script>
   <script src="js/core/rules.js"></script>
   <script src="js/core/router.js"></script>
 
