@@ -27,7 +27,9 @@
   var exitTimer = null;
   var skipBackEvent = false;         // программный back() не спрашивает перехватчиков
   var navBound = false;
-  var domQueue = [];                 // переходы, запрошенные до готовности DOM
+  var domQueue = [];
+  // Запасные имена: если экран с таким id не зарегистрирован, открываем похожий
+  var ALIASES = { home: 'lobby', games: 'lobby', profile: 'stats', bank: 'settings', more: 'settings', rules: 'rules' };                 // переходы, запрошенные до готовности DOM
 
   // ------------------------------------------------------------------
   // Вспомогательные функции
@@ -123,7 +125,7 @@
     for (var i = 0; i < items.length; i++) {
       var on = items[i].getAttribute('data-screen') === tab;
       items[i].classList.toggle('active', on);
-items[i].classList.toggle('is-active', on);
+      items[i].classList.toggle('is-active', on);
       if (on) items[i].setAttribute('aria-current', 'page');
       else items[i].removeAttribute('aria-current');
     }
@@ -404,6 +406,9 @@ items[i].classList.toggle('is-active', on);
       if (document.readyState === 'loading') {
         domQueue.push([screenId, params]);
         return true;
+      }
+      if (!screens[screenId] && ALIASES[screenId] && screens[ALIASES[screenId]]) {
+        screenId = ALIASES[screenId];
       }
       if (!screens[screenId]) {
         console.error('[Router] Экран не зарегистрирован: ' + screenId);
