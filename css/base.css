@@ -89,6 +89,7 @@
   --nb-header-h: 56px;      /* высота шапки без safe-area */
   --nb-nav-h: 64px;         /* высота нижней навигации без safe-area */
   --nb-content-max: 560px;  /* максимальная ширина контента на широких экранах */
+  --nb-nav-gap: 10px;       /* зазор плавающей навигации от краёв экрана */
 
   /* Safe-area (вырезы, «чёлки», жестовая полоса) */
   --nb-safe-top: env(safe-area-inset-top, 0px);
@@ -183,7 +184,6 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;           /* без задержки и двойного тапа-зума */
   overscroll-behavior: none;            /* без «резинки» и pull-to-refresh */
   background: var(--nb-bg);
 }
@@ -223,6 +223,12 @@ img,
 svg {
   -webkit-user-drag: none;
   user-drag: none;
+}
+
+/* touch-action задаём ТОЛЬКО на canvas (игры сами обрабатывают жесты),
+   на остальном интерфейсе вертикальный скролл остаётся нативным */
+canvas {
+  touch-action: none;
 }
 
 a,
@@ -330,8 +336,49 @@ strong, b { font-weight: 700; color: var(--nb-text); }
   to   { opacity: 1; transform: none; }
 }
 
+/* ---------- 5a. Каркас по ID (разметка index.html) ----------
+   В index.html контейнеры называются #app / #header / #screen / #nav
+   (классы без префикса nb-), поэтому стили каркаса привязаны к ID:
+   они не зависят от классов и перекрывают layout.css по специфичности.
+
+   Схема:  #app (fixed, flex column)
+             ├─ #header  — flex: 0 0 auto (закреплена)
+             ├─ #screen  — flex: 1 1 0; min-height: 0; overflow-y: auto  ← ТУТ СКРОЛЛ
+             └─ #nav     — position: absolute (плавающая), экран резервирует под неё место */
+#screen {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;                        /* без этого flex-ребёнок не сжимается и не скроллится */
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;         /* не передаём прокрутку странице */
+  scroll-behavior: auto;                /* programmatic scrollTop = 0 при смене экрана — мгновенно */
+  scrollbar-width: none;
+  animation: none;
+}
+#screen::-webkit-scrollbar { display: none; }
+
+/* Резерв под плавающую навигацию + жестовую полосу: спейсер в конце контента
+   (надёжнее padding-bottom у скролл-контейнера) */
+#screen::after {
+  content: "";
+  flex: 0 0 auto;
+  height: calc(var(--nb-nav-h) + var(--nb-safe-bottom) + var(--nb-nav-gap) * 2);
+}
+
+/* Игровой экран и вложенные .nb-scroll заполняют контейнер и скроллятся сами */
+#screen > .nb-scroll,
+#screen > .nb-game {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 /* ---------- 6. Шапка ---------- */
-.nb-header {
+.nb-header,
+#header {
   position: relative;
   z-index: var(--nb-z-header);
   flex: 0 0 auto;
@@ -348,7 +395,8 @@ strong, b { font-weight: 700; color: var(--nb-text); }
   backdrop-filter: blur(10px);
 }
 
-.nb-header::after {
+.nb-header::after,
+#header::after {
   /* неоновая линия под шапкой */
   content: "";
   position: absolute;
@@ -520,7 +568,8 @@ strong, b { font-weight: 700; color: var(--nb-text); }
   pointer-events: none;
 }
 
-.nb-nav__item {
+.nb-nav__item,
+.nav__item {
   position: relative;
   flex: 1 1 0;
   min-width: var(--nb-tap);
@@ -541,25 +590,30 @@ strong, b { font-weight: 700; color: var(--nb-text); }
               background var(--nb-t-mid);
 }
 
-.nb-nav__icon {
+.nb-nav__icon,
+.nav__icon {
   font-size: 24px;
   line-height: 1;
   filter: grayscale(0.7) brightness(0.85);
   transition: transform var(--nb-t-mid) var(--nb-ease), filter var(--nb-t-mid);
 }
 
-.nb-nav__item:active { transform: scale(0.92); }
+.nb-nav__item:active,
+.nav__item:active { transform: scale(0.92); }
 
-.nb-nav__item.is-active {
+.nb-nav__item.is-active,
+.nav__item.is-active {
   color: var(--nb-gold-light);
   background: radial-gradient(60% 80% at 50% 0%, rgba(168, 85, 247, 0.28), rgba(168, 85, 247, 0) 100%);
   text-shadow: 0 0 10px var(--nb-gold-glow);
 }
-.nb-nav__item.is-active .nb-nav__icon {
+.nb-nav__item.is-active .nb-nav__icon,
+.nav__item.is-active .nav__icon {
   filter: none drop-shadow(0 0 8px var(--nb-purple-glow));
   transform: translateY(-2px) scale(1.12);
 }
-.nb-nav__item.is-active::after {
+.nb-nav__item.is-active::after,
+.nav__item.is-active::after {
   content: "";
   position: absolute;
   top: 0;
@@ -589,8 +643,111 @@ strong, b { font-weight: 700; color: var(--nb-text); }
   box-shadow: 0 0 8px var(--nb-danger-glow);
 }
 
+/* Плавающая нижняя навигация (#nav): поверх контента, над жестовой полосой */
+#nav {
+  position: absolute;
+  left: calc(var(--nb-nav-gap) + var(--nb-safe-left));
+  right: calc(var(--nb-nav-gap) + var(--nb-safe-right));
+  bottom: calc(var(--nb-nav-gap) + var(--nb-safe-bottom));
+  z-index: var(--nb-z-nav);
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  height: var(--nb-nav-h);
+  min-height: var(--nb-nav-h);
+  padding: 6px var(--nb-sp-2);
+  background: linear-gradient(180deg, rgba(35, 22, 68, 0.92) 0%, rgba(11, 7, 20, 0.96) 100%);
+  border: 1px solid var(--nb-border-strong);
+  border-radius: var(--nb-r-xl);
+  box-shadow: var(--nb-shadow-lg), 0 0 18px rgba(168, 85, 247, 0.2);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+#nav::before {
+  content: "";
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  top: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--nb-gold), var(--nb-purple), var(--nb-gold), transparent);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Базовые стили внутренностей шапки (класс-уровень: layout.css может переопределить) */
+.header__balance { flex: 0 0 auto; display: flex; align-items: center; gap: var(--nb-sp-2); }
+.header__coin { font-size: 24px; line-height: 1; }
+.header__balance-text { display: flex; flex-direction: column; line-height: 1.1; }
+.header__label { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: var(--nb-text-mute); }
+.header__balance-value {
+  font-size: var(--nb-fs-lg);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: var(--nb-gold-light);
+}
+.header__level {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+}
+.header__level-top { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.header__level-badge {
+  flex: 0 0 auto;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 22px;
+  text-align: center;
+  color: var(--nb-text-on-accent);
+  background: var(--nb-grad-gold);
+  border-radius: var(--nb-r-pill);
+}
+.header__level-title {
+  min-width: 0;
+  font-size: var(--nb-fs-xs);
+  font-weight: 700;
+  color: var(--nb-text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.xpbar {
+  height: 6px;
+  overflow: hidden;
+  background: var(--nb-surface-2);
+  border: 1px solid var(--nb-border);
+  border-radius: var(--nb-r-pill);
+}
+.xpbar__fill {
+  width: 0;
+  height: 100%;
+  background: var(--nb-grad-gold);
+  border-radius: inherit;
+  transition: width var(--nb-t-slow) var(--nb-ease);
+}
+.header__sound {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--nb-tap);
+  min-height: var(--nb-tap);
+  font-size: 22px;
+  line-height: 1;
+  background: var(--nb-surface-2);
+  border: 1px solid var(--nb-border);
+  border-radius: var(--nb-r-md);
+}
+
 /* ---------- 9. Заставка (splash) ---------- */
-.nb-splash {
+.nb-splash,
+.splash {
   position: fixed;
   inset: 0;
   z-index: var(--nb-z-splash);
@@ -606,7 +763,8 @@ strong, b { font-weight: 700; color: var(--nb-text); }
     linear-gradient(180deg, #160a2e 0%, #05020b 100%);
   transition: opacity var(--nb-t-slow) var(--nb-ease), visibility var(--nb-t-slow);
 }
-.nb-splash.is-hidden {
+.nb-splash.is-hidden,
+.splash.is-hidden {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -640,7 +798,8 @@ strong, b { font-weight: 700; color: var(--nb-text); }
   color: var(--nb-purple-light);
 }
 
-.nb-splash__bar {
+.nb-splash__bar,
+.splash__bar {
   width: min(240px, 60vw);
   height: 6px;
   overflow: hidden;
@@ -658,7 +817,8 @@ strong, b { font-weight: 700; color: var(--nb-text); }
   animation: nb-loading 1.3s var(--nb-ease) infinite;
 }
 
-.nb-splash__note {
+.nb-splash__note,
+.splash__note {
   position: absolute;
   left: 0;
   right: 0;
@@ -678,6 +838,33 @@ strong, b { font-weight: 700; color: var(--nb-text); }
 @keyframes nb-loading {
   0%   { transform: translateX(-110%); }
   100% { transform: translateX(270%); }
+}
+
+/* Внутренности заставки из index.html */
+.splash__inner { display: flex; flex-direction: column; align-items: center; gap: var(--nb-sp-4); }
+.splash__logo { filter: drop-shadow(0 0 16px var(--nb-purple-glow)); animation: nb-float 2.4s ease-in-out infinite; }
+.splash__title {
+  font-size: 54px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  line-height: 1;
+}
+.splash__naeb { color: var(--nb-text); }
+.splash__bet {
+  background: var(--nb-grad-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.splash__sub { font-size: var(--nb-fs-sm); letter-spacing: 1px; color: var(--nb-purple-light); }
+.splash__bar-fill {
+  width: 0;
+  height: 100%;
+  background: var(--nb-grad-gold);
+  border-radius: inherit;
+  box-shadow: var(--nb-glow-gold);
+  transition: width 1.6s var(--nb-ease);
 }
 
 /* ---------- 10. Базовые компоненты (кнопки, карточки, чипы) ---------- */
@@ -826,8 +1013,10 @@ strong, b { font-weight: 700; color: var(--nb-text); }
     --nb-header-h: 48px;
     --nb-nav-h: 56px;
   }
-  .nb-nav__item { font-size: 10px; }
-  .nb-nav__icon { font-size: 20px; }
+  .nb-nav__item,
+  .nav__item { font-size: 10px; }
+  .nb-nav__icon,
+  .nav__icon { font-size: 20px; }
   .nb-splash__logo { font-size: 40px; }
   .nb-splash__emoji { font-size: 48px; }
 }
