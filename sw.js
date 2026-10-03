@@ -3,39 +3,45 @@
    --------------------------------------------------------------------------
    КАК ОБНОВЛЯТЬ ВЕРСИЮ КЭША:
    1. После ЛЮБОГО изменения файлов проекта (js, css, html, manifest.json)
-      увеличьте значение CACHE_VERSION ниже (например 'v1' -> 'v2').
+      увеличьте CACHE_VERSION ниже (например 'v7' -> 'v8').
    2. Если добавили или удалили файл — отредактируйте массив CACHE_FILES.
-   3. Задеплойте. При следующем открытии приложения браузер увидит, что sw.js
-      изменился, установит новый воркер и создаст новый кэш
-      "naebbet-<версия>"; при активации старые кэши удалятся автоматически.
-   4. Пока версию не поменяли, пользователи будут видеть СТАРЫЕ файлы
-      из кэша (это особенность cache-first).
+      Список должен совпадать с тегами <script> и <link> в index.html.
+   3. Загрузите файлы на GitHub, подождите 1–2 минуты, закройте и заново
+      откройте приложение. Браузер увидит, что sw.js изменился, создаст
+      новый кэш "naebbet-<версия>" и удалит старые.
+   4. Пока версию не поменяли, телефон показывает СТАРЫЕ файлы из кэша
+      (особенность cache-first).
    Данные игрока (localStorage, ключи "nb_*") при обновлении кэша
    НЕ затрагиваются.
    ========================================================================== */
 'use strict';
 
-// Версия кэша — менять при каждом релизе (см. инструкцию выше)
-const CACHE_VERSION = 'v6';
+// Версия кэша — менять при каждом релизе
+const CACHE_VERSION = 'v7';
 
 // Префикс нужен, чтобы удалять только свои старые кэши
 const CACHE_PREFIX = 'naebbet-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
 
-// Страница, которую отдаём при навигации, если сети нет и запроса нет в кэше
+// Страница, которую отдаём при переходе, если сети нет и запроса нет в кэше
 const FALLBACK_PAGE = './index.html';
 
-// Список ВСЕХ файлов проекта для офлайн-работы.
-// Пути относительные от расположения sw.js. Подправьте под реальную структуру.
+// Все файлы проекта для офлайн-работы (пути относительно sw.js).
+// Если какого-то файла у вас нет, удалите строку из списка:
+// это не ломает установку, но даёт предупреждение в консоли.
 const CACHE_FILES = [
   './',
   './index.html',
   './manifest.json',
 
   // Стили
-  './css/style.css',
+  './css/base.css',
+  './css/layout.css',
+  './css/components.css',
+  './css/games.css',
 
   // Ядро
+  './js/core/namespace.js',
   './js/core/events.js',
   './js/core/storage.js',
   './js/core/rng.js',
@@ -45,6 +51,7 @@ const CACHE_FILES = [
   './js/core/stats.js',
   './js/core/levels.js',
   './js/core/achievements.js',
+  './js/core/bonuses.js',
   './js/core/rules.js',
   './js/core/router.js',
   './js/core/games.js',
@@ -57,14 +64,19 @@ const CACHE_FILES = [
   './js/games/coinflip.js',
   './js/games/crash.js',
   './js/games/mines.js',
-  './js/games/poker.js',
+  './js/games/plinko.js',
 
-  // Экраны и запуск приложения
+  // Экраны
   './js/screens/lobby.js',
+  './js/screens/games.js',
+  './js/screens/game.js',
   './js/screens/profile.js',
-  './js/screens/stats.js',
-  './js/screens/settings.js',
-  './js/app.js'
+  './js/screens/bank.js',
+  './js/screens/more.js',
+  './js/screens/rules.js',
+
+  // Точка входа
+  './js/main.js'
 ];
 
 // --------------------------------------------------------------------------
@@ -73,10 +85,10 @@ const CACHE_FILES = [
 self.addEventListener('install', function (event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function (cache) {
-      // Грузим файлы по одному: если какого-то файла из списка нет на сервере,
-      // установка не рушится целиком (в отличие от cache.addAll).
+      // Грузим файлы по одному: если какого-то нет на сервере, установка
+      // не рушится целиком (в отличие от cache.addAll).
       return Promise.all(CACHE_FILES.map(function (url) {
-        // cache: 'reload' — обходим HTTP-кэш браузера, чтобы взять свежую версию
+        // cache: 'reload' — обходим HTTP-кэш браузера, берём свежую версию
         return fetch(new Request(url, { cache: 'reload' }))
           .then(function (response) {
             if (!response || !response.ok) {
@@ -89,7 +101,7 @@ self.addEventListener('install', function (event) {
           });
       }));
     }).then(function () {
-      // Не ждём закрытия старых вкладок — новый воркер сразу готов к активации
+      // Новый воркер сразу готов к активации, не ждём закрытия вкладок
       return self.skipWaiting();
     })
   );
