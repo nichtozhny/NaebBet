@@ -620,7 +620,7 @@
     var body = h('div', 'nb-m-body');
     page.appendChild(body);
 
-    if (false) { //навигация теперь в  index.html
+    if (false) { // нижняя навигация теперь в index.html
       var nav = h('div', 'nb-m-nav');
       TABS.forEach(function (t) {
         var b = h('button', 'nb-m-tab' + (t.id === opts.tab ? ' on' : ''), '<span>' + t.ico + '</span>' + esc(t.t));
@@ -1538,7 +1538,10 @@
   /* ------------------------------------------------------------------------
    * Запуск
    * ---------------------------------------------------------------------- */
-  // Шапка из index.html: баланс, уровень, кнопка звука
+
+  /* ------------------------------------------------------------------------
+   * Шапка из index.html: баланс, уровень, кнопка звука
+   * ---------------------------------------------------------------------- */
   function syncHeader() {
     var b = doc.getElementById('header-balance');
     if (b) b.textContent = fmt(balance());
@@ -1572,11 +1575,12 @@
       });
     }
     ['balance:change', 'round:settled', 'level:up'].forEach(function (name) {
-      NB.Events.on(name, syncHeader);
+      safe(function () { NB.Events.on(name, syncHeader); });
     });
     syncHeader();
     paintSound();
   }
+
   async function boot() {
     if (state.booted) return;
     state.booted = true;
