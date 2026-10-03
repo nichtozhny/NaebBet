@@ -123,6 +123,7 @@
     for (var i = 0; i < items.length; i++) {
       var on = items[i].getAttribute('data-screen') === tab;
       items[i].classList.toggle('active', on);
+items[i].classList.toggle('is-active', on);
       if (on) items[i].setAttribute('aria-current', 'page');
       else items[i].removeAttribute('aria-current');
     }
