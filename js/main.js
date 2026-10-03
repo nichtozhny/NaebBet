@@ -620,7 +620,7 @@
     var body = h('div', 'nb-m-body');
     page.appendChild(body);
 
-    if (opts.tab) {
+    if (false) { //навигация теперь в  index.html
       var nav = h('div', 'nb-m-nav');
       TABS.forEach(function (t) {
         var b = h('button', 'nb-m-tab' + (t.id === opts.tab ? ' on' : ''), '<span>' + t.ico + '</span>' + esc(t.t));
@@ -1538,6 +1538,45 @@
   /* ------------------------------------------------------------------------
    * Запуск
    * ---------------------------------------------------------------------- */
+  // Шапка из index.html: баланс, уровень, кнопка звука
+  function syncHeader() {
+    var b = doc.getElementById('header-balance');
+    if (b) b.textContent = fmt(balance());
+    var i = safe(function () { return NB.Levels.getInfo(); }, null);
+    if (!i) return;
+    var n = doc.getElementById('header-level-num');
+    var t = doc.getElementById('header-level-title');
+    var f = doc.getElementById('header-xp-fill');
+    if (n) n.textContent = i.level;
+    if (t) t.textContent = i.title || '';
+    if (f) {
+      var xp = +i.xp || 0, total = xp + (+i.xpToNext || 0);
+      f.style.width = (total > 0 ? Math.round(xp / total * 100) : 100) + '%';
+    }
+  }
+
+  function bindHeader() {
+    var btn = doc.getElementById('btn-sound');
+    var ico = doc.getElementById('btn-sound-icon');
+    function paintSound() {
+      var m = safe(function () { return NB.Audio.isMuted(); }, false);
+      if (ico) ico.textContent = m ? '🔇' : '🔊';
+      if (btn) btn.setAttribute('aria-pressed', m ? 'true' : 'false');
+    }
+    if (btn) {
+      btn.addEventListener('click', function () {
+        var m = safe(function () { return NB.Audio.isMuted(); }, false);
+        safe(function () { NB.Audio.setMuted(!m); });
+        if (m) sfx('click');
+        paintSound();
+      });
+    }
+    ['balance:change', 'round:settled', 'level:up'].forEach(function (name) {
+      NB.Events.on(name, syncHeader);
+    });
+    syncHeader();
+    paintSound();
+  }
   async function boot() {
     if (state.booted) return;
     state.booted = true;
@@ -1562,6 +1601,7 @@
     recoverAutoMute();
     restoreAudio();
     bindAppEvents();
+    bindHeader();
 
     splashProgress(0.85, 'Готовим экраны…');
     try {
