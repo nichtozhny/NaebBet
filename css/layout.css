@@ -1,4 +1,7 @@
-/* ===== Раскладка: шапка сверху, прокручиваемый #screen, плавающее меню ===== */
+/* ==========================================================================
+   NaebBet — css/layout.css
+   Раскладка: шапка сверху, прокручиваемый блок #screen, плавающее меню.
+   ========================================================================== */
 html, body {
   height: 100%;
   margin: 0;
@@ -10,6 +13,7 @@ html, body {
   position: relative;
   height: 100vh;
   height: 100dvh;
+  min-height: 0 !important;
   display: flex;
   flex-direction: column;
   overflow: hidden;
