@@ -1,0 +1,1202 @@
+/* ==========================================================================
+   NaebBet — css/screens.css
+   Стили экранов: лобби, каталог, профиль, история, правила, банк, настройки.
+   Mobile-first, портретная ориентация, тёмная тема, неоновые акценты.
+   Без hover-зависимостей: состояния только :active / :focus-visible / .is-*
+   Переменные берутся из base.css; здесь заданы запасные значения (fallback).
+   ========================================================================== */
+
+/* ---------- Локальные переменные экранов ---------- */
+.screen {
+  --s-bg: var(--nb-bg, #0b0714);
+  --s-surface: var(--nb-surface, #161026);
+  --s-surface-2: var(--nb-surface-2, #1f1636);
+  --s-border: var(--nb-border, rgba(167, 112, 255, 0.22));
+  --s-text: var(--nb-text, #f3eeff);
+  --s-muted: var(--nb-muted, #9a8fb8);
+  --s-purple: var(--nb-purple, #a855f7);
+  --s-purple-2: var(--nb-purple-2, #7c3aed);
+  --s-gold: var(--nb-gold, #ffd24a);
+  --s-gold-2: var(--nb-gold-2, #ff9f1c);
+  --s-green: var(--nb-green, #31e57f);
+  --s-red: var(--nb-red, #ff4d6d);
+  --s-radius: 16px;
+  --s-radius-sm: 12px;
+  --s-gap: 12px;
+  --s-pad: 16px;
+  --s-tap: 44px;
+  --s-glow-purple: 0 0 14px rgba(168, 85, 247, 0.45);
+  --s-glow-gold: 0 0 14px rgba(255, 210, 74, 0.45);
+}
+
+/* ---------- Базовый контейнер экрана ---------- */
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-gap);
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: var(--s-pad);
+  padding-bottom: calc(var(--s-pad) + 76px + env(safe-area-inset-bottom, 0px));
+  color: var(--s-text);
+  box-sizing: border-box;
+  animation: scr-fade-in 0.25s ease-out;
+}
+
+.screen *,
+.screen *::before,
+.screen *::after {
+  box-sizing: border-box;
+}
+
+@keyframes scr-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Шапка экрана с кнопкой «назад» */
+.scr-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--s-tap);
+}
+
+.scr-header__back {
+  flex: 0 0 auto;
+  width: var(--s-tap);
+  height: var(--s-tap);
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--s-border);
+  border-radius: 50%;
+  background: var(--s-surface);
+  color: var(--s-text);
+  font-size: 20px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.scr-header__back:active { transform: scale(0.92); background: var(--s-surface-2); }
+
+.scr-title {
+  margin: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  background: linear-gradient(90deg, var(--s-gold), var(--s-purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scr-section-title {
+  margin: 6px 2px 0;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--s-muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.scr-section-title__link {
+  min-height: var(--s-tap);
+  display: inline-flex;
+  align-items: center;
+  padding: 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--s-purple);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* Универсальная карточка */
+.scr-card {
+  background: linear-gradient(160deg, var(--s-surface), var(--s-surface-2));
+  border: 1px solid var(--s-border);
+  border-radius: var(--s-radius);
+  padding: var(--s-pad);
+}
+
+/* Универсальные кнопки экранов */
+.scr-btn {
+  min-height: var(--s-tap);
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--s-border);
+  border-radius: var(--s-radius-sm);
+  background: var(--s-surface-2);
+  color: var(--s-text);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  transition: transform 0.08s ease, filter 0.15s ease;
+}
+
+.scr-btn:active { transform: scale(0.96); filter: brightness(1.15); }
+.scr-btn:focus-visible { outline: 2px solid var(--s-gold); outline-offset: 2px; }
+.scr-btn[disabled], .scr-btn.is-disabled { opacity: 0.45; pointer-events: none; }
+
+.scr-btn--primary {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--s-purple), var(--s-purple-2));
+  box-shadow: var(--s-glow-purple);
+  color: #fff;
+}
+
+.scr-btn--gold {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--s-gold), var(--s-gold-2));
+  box-shadow: var(--s-glow-gold);
+  color: #2a1a00;
+}
+
+.scr-btn--danger {
+  border-color: rgba(255, 77, 109, 0.5);
+  background: rgba(255, 77, 109, 0.12);
+  color: var(--s-red);
+}
+
+.scr-btn--block { width: 100%; }
+
+.scr-empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--s-muted);
+  font-size: 14px;
+}
+
+.scr-empty__icon { display: block; font-size: 42px; margin-bottom: 8px; }
+
+/* ==========================================================================
+   ЛОББИ
+   ========================================================================== */
+.lobby__hello {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: var(--s-pad);
+  border-radius: var(--s-radius);
+  border: 1px solid var(--s-border);
+  background:
+    radial-gradient(circle at 90% 0%, rgba(255, 210, 74, 0.18), transparent 55%),
+    radial-gradient(circle at 0% 100%, rgba(168, 85, 247, 0.28), transparent 60%),
+    var(--s-surface);
+}
+
+.lobby__avatar {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  font-size: 30px;
+  border-radius: 50%;
+  background: var(--s-surface-2);
+  border: 2px solid var(--s-gold);
+  box-shadow: var(--s-glow-gold);
+}
+
+.lobby__hello-text { flex: 1 1 auto; min-width: 0; }
+
+.lobby__greeting {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lobby__subtitle { margin: 2px 0 0; font-size: 13px; color: var(--s-muted); }
+
+.lobby__balance {
+  margin-top: 4px;
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--s-gold);
+  text-shadow: 0 0 12px rgba(255, 210, 74, 0.5);
+  font-variant-numeric: tabular-nums;
+}
+
+.lobby__level {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.lobby__level-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--s-muted);
+}
+
+.scr-progress {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.scr-progress__bar {
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--s-purple), var(--s-gold));
+  box-shadow: var(--s-glow-purple);
+  transition: width 0.5s ease;
+}
+
+/* Ежедневный бонус */
+.daily {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: var(--s-pad);
+  border-radius: var(--s-radius);
+  border: 1px solid rgba(255, 210, 74, 0.45);
+  background: linear-gradient(135deg, rgba(255, 210, 74, 0.14), rgba(168, 85, 247, 0.14));
+  overflow: hidden;
+}
+
+.daily__icon {
+  flex: 0 0 auto;
+  font-size: 38px;
+  animation: scr-float 2.4s ease-in-out infinite;
+}
+
+.daily__body { flex: 1 1 auto; min-width: 0; }
+.daily__title { margin: 0; font-size: 16px; font-weight: 800; color: var(--s-gold); }
+.daily__text { margin: 2px 0 0; font-size: 13px; color: var(--s-muted); }
+
+.daily__days {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.daily__day {
+  flex: 1 1 0;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.daily__day.is-done { background: var(--s-gold); box-shadow: var(--s-glow-gold); }
+.daily__day.is-today { background: var(--s-purple); box-shadow: var(--s-glow-purple); }
+
+.daily.is-claimed { border-color: var(--s-border); background: var(--s-surface); }
+.daily.is-claimed .daily__icon { animation: none; filter: grayscale(0.8); opacity: 0.7; }
+.daily.is-ready { animation: scr-pulse-gold 2s ease-in-out infinite; }
+
+@keyframes scr-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-5px); }
+}
+
+@keyframes scr-pulse-gold {
+  0%, 100% { box-shadow: 0 0 0 rgba(255, 210, 74, 0); }
+  50%      { box-shadow: 0 0 18px rgba(255, 210, 74, 0.4); }
+}
+
+/* Популярные игры (горизонтальная лента) */
+.popular {
+  display: flex;
+  gap: var(--s-gap);
+  margin: 0 calc(var(--s-pad) * -1);
+  padding: 4px var(--s-pad) 8px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.popular::-webkit-scrollbar { display: none; }
+
+.popular__item {
+  flex: 0 0 140px;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 10px 12px;
+  min-height: 150px;
+  border-radius: var(--s-radius);
+  border: 1px solid var(--s-border);
+  background: linear-gradient(170deg, var(--s-surface-2), var(--s-surface));
+  color: var(--s-text);
+  text-align: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.popular__item:active { transform: scale(0.96); border-color: var(--s-purple); }
+.popular__icon { font-size: 44px; line-height: 1; filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.6)); }
+.popular__name { font-size: 14px; font-weight: 800; }
+.popular__meta { font-size: 11px; color: var(--s-muted); }
+
+.popular__badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: var(--s-gold);
+  color: #2a1a00;
+}
+
+/* Последние выигрыши */
+.wins { display: flex; flex-direction: column; gap: 8px; }
+
+.wins__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--s-tap);
+  padding: 8px 12px;
+  border-radius: var(--s-radius-sm);
+  background: var(--s-surface);
+  border: 1px solid var(--s-border);
+}
+
+.wins__icon { flex: 0 0 auto; font-size: 24px; }
+.wins__info { flex: 1 1 auto; min-width: 0; }
+.wins__game { font-size: 14px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wins__time { font-size: 11px; color: var(--s-muted); }
+.wins__amount { flex: 0 0 auto; font-size: 15px; font-weight: 800; color: var(--s-green); font-variant-numeric: tabular-nums; }
+.wins__item.is-big { border-color: rgba(255, 210, 74, 0.5); box-shadow: inset 0 0 14px rgba(255, 210, 74, 0.1); }
+.wins__item.is-big .wins__amount { color: var(--s-gold); text-shadow: 0 0 8px rgba(255, 210, 74, 0.5); }
+
+/* ==========================================================================
+   КАТАЛОГ ИГР
+   ========================================================================== */
+.catalog__search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.catalog__search-icon {
+  position: absolute;
+  left: 14px;
+  font-size: 16px;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.catalog__input {
+  width: 100%;
+  min-height: var(--s-tap);
+  padding: 0 44px 0 42px;
+  border-radius: var(--s-radius-sm);
+  border: 1px solid var(--s-border);
+  background: var(--s-surface);
+  color: var(--s-text);
+  font-size: 16px; /* 16px — чтобы iOS не зумил поле */
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.catalog__input::placeholder { color: var(--s-muted); }
+.catalog__input:focus { border-color: var(--s-purple); box-shadow: var(--s-glow-purple); }
+
+.catalog__clear {
+  position: absolute;
+  right: 0;
+  width: var(--s-tap);
+  height: var(--s-tap);
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: none;
+  color: var(--s-muted);
+  font-size: 18px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* Фильтры по категориям */
+.filters {
+  display: flex;
+  gap: 8px;
+  margin: 0 calc(var(--s-pad) * -1);
+  padding: 2px var(--s-pad);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.filters::-webkit-scrollbar { display: none; }
+
+.filters__chip {
+  flex: 0 0 auto;
+  min-height: var(--s-tap);
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  border: 1px solid var(--s-border);
+  background: var(--s-surface);
+  color: var(--s-muted);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.filters__chip:active { transform: scale(0.95); }
+
+.filters__chip.is-active {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--s-purple), var(--s-purple-2));
+  box-shadow: var(--s-glow-purple);
+}
+
+.catalog__count { font-size: 12px; color: var(--s-muted); margin: 0 2px; }
+
+/* Сетка игр */
+.catalog__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-gap);
+}
+
+.game-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-height: 170px;
+  padding: 16px 10px 12px;
+  border-radius: var(--s-radius);
+  border: 1px solid var(--s-border);
+  background: linear-gradient(170deg, var(--s-surface-2), var(--s-surface));
+  color: var(--s-text);
+  text-align: center;
+  cursor: pointer;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.game-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.25), transparent 65%);
+  pointer-events: none;
+}
+
+.game-card:active { transform: scale(0.96); border-color: var(--s-gold); }
+.game-card:focus-visible { outline: 2px solid var(--s-gold); outline-offset: 2px; }
+
+.game-card__icon { position: relative; font-size: 46px; line-height: 1.1; filter: drop-shadow(0 0 8px rgba(255, 210, 74, 0.45)); }
+.game-card__name { position: relative; font-size: 15px; font-weight: 800; }
+.game-card__desc { position: relative; font-size: 11px; line-height: 1.35; color: var(--s-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.game-card__meta { position: relative; margin-top: auto; display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+
+.game-card__tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--s-muted);
+}
+
+.game-card__tag--rtp { color: var(--s-green); background: rgba(49, 229, 127, 0.12); }
+.game-card__tag--bet { color: var(--s-gold); background: rgba(255, 210, 74, 0.12); }
+
+.game-card__fav {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: var(--s-tap);
+  height: var(--s-tap);
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: none;
+  font-size: 18px;
+  color: var(--s-muted);
+  cursor: pointer;
+  z-index: 1;
+}
+
+.game-card__fav.is-on { color: var(--s-gold); }
+
+/* ==========================================================================
+   ПРОФИЛЬ
+   ========================================================================== */
+.profile__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px var(--s-pad);
+  text-align: center;
+  border-radius: var(--s-radius);
+  border: 1px solid var(--s-border);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.35), transparent 65%),
+    var(--s-surface);
+}
+
+.profile__avatar {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  display: grid;
+  place-items: center;
+  font-size: 52px;
+  border-radius: 50%;
+  background: var(--s-surface-2);
+  border: 3px solid var(--s-gold);
+  box-shadow: var(--s-glow-gold), inset 0 0 20px rgba(168, 85, 247, 0.3);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.profile__avatar:active { transform: scale(0.95); }
+
+.profile__lvl-badge {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 6px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 900;
+  color: #2a1a00;
+  background: linear-gradient(135deg, var(--s-gold), var(--s-gold-2));
+  border: 2px solid var(--s-bg);
+}
+
+.profile__name { margin: 0; font-size: 22px; font-weight: 900; }
+.profile__title { margin: 0; font-size: 13px; font-weight: 700; color: var(--s-gold); text-transform: uppercase; letter-spacing: 1px; }
+.profile__xp { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 6px; }
+.profile__xp-text { display: flex; justify-content: space-between; font-size: 12px; color: var(--s-muted); }
+
+/* Выбор аватара */
+.avatar-picker {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.avatar-picker__item {
+  min-height: 64px;
+  display: grid;
+  place-items: center;
+  font-size: 32px;
+  border-radius: var(--s-radius-sm);
+  border: 2px solid var(--s-border);
+  background: var(--s-surface);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.avatar-picker__item.is-active { border-color: var(--s-gold); box-shadow: var(--s-glow-gold); }
+
+/* Сетка карточек статистики */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 12px;
+  border-radius: var(--s-radius-sm);
+  border: 1px solid var(--s-border);
+  background: var(--s-surface);
+  min-width: 0;
+}
+
+.stat-card__icon { font-size: 20px; }
+.stat-card__label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--s-muted); }
+.stat-card__value { font-size: 20px; font-weight: 900; font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stat-card__sub { font-size: 11px; color: var(--s-muted); }
+.stat-card--gold .stat-card__value { color: var(--s-gold); }
+.stat-card--green .stat-card__value { color: var(--s-green); }
+.stat-card--red .stat-card__value { color: var(--s-red); }
+.stat-card--purple .stat-card__value { color: var(--s-purple); }
+.stat-card--wide { grid-column: 1 / -1; }
+
+/* Графики на canvas */
+.chart-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border-radius: var(--s-radius);
+  border: 1px solid var(--s-border);
+  background: var(--s-surface);
+}
+
+.chart-box__title { margin: 0; font-size: 14px; font-weight: 800; }
+
+.chart-box__canvas-wrap {
+  position: relative;
+  width: 100%;
+  height: 180px;
+}
+
+.chart-box__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: pan-y;
+}
+
+.chart-box__legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--s-muted); }
+.chart-box__legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.chart-box__dot { width: 10px; height: 10px; border-radius: 50%; background: var(--s-purple); }
+.chart-box__dot--gold { background: var(--s-gold); }
+.chart-box__dot--green { background: var(--s-green); }
+.chart-box__dot--red { background: var(--s-red); }
+
+/* Достижения */
+.ach-summary { font-size: 13px; color: var(--s-muted); margin: 0 2px; }
+
+.ach-list { display: flex; flex-direction: column; gap: 8px; }
+
+.ach {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--s-radius-sm);
+  border: 1px solid var(--s-border);
+  background: var(--s-surface);
+}
+
+.ach__icon {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  border-radius: 50%;
+  background: var(--s-surface-2);
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
+.ach__body { flex: 1 1 auto; min-width: 0; }
+.ach__name { margin: 0; font-size: 14px; font-weight: 800; }
+.ach__desc { margin: 2px 0 0; font-size: 12px; line-height: 1.35; color: var(--s-muted); }
+.ach__progress { margin-top: 6px; }
+.ach__reward { flex: 0 0 auto; font-size: 12px; font-weight: 800; color: var(--s-gold); }
+
+.ach.is-unlocked { border-color: rgba(255, 210, 74, 0.5); background: linear-gradient(135deg, rgba(255, 210, 74, 0.1), var(--s-surface)); }
+.ach.is-unlocked .ach__icon { filter: none; opacity: 1; border: 2px solid var(--s-gold); box-shadow: var(--s-glow-gold); }
+.ach.is-locked .ach__name { color: var(--s-muted); }
+
+/* ==========================================================================
+   ИСТОРИЯ СТАВОК
+   ========================================================================== */
+.history__filters { display: flex; flex-direction: column; gap: 8px; }
+
+.history__segments {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 4px;
+  gap: 4px;
+  border-radius: var(--s-radius-sm);
+  background: var(--s-surface);
+  border: 1px solid var(--s-border);
+}
+
+.history__segment {
+  min-height: 40px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--s-muted);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.history__segment.is-active { background: linear-gradient(135deg, var(--s-purple), var(--s-purple-2)); color: #fff; box-shadow: var(--s-glow-purple); }
+
+.history__select {
+  width: 100%;
+  min-height: var(--s-tap);
+  padding: 0 12px;
+  border-radius: var(--s-radius-sm);
+  border: 1px solid var(--s-border);
+  background: var(--s-surface);
+  color: var(--s-text);
+  font-size: 16px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.history__list { display: flex; flex-direction: column; gap: 8px; }
+
+.hist-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding: 10px 12px;
+  border-radius: var(--s-radius-sm);
+  border: 1px solid var(--s-border);
+  border-left-width: 4px;
+  background: var(--s-surface);
+  color: var(--s-text);
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.hist-item:active { background: var(--s-surface-2); }
+.hist-item.is-win { border-left-color: var(--s-green); }
+.hist-item.is-lose { border-left-color: var(--s-red); }
+.hist-item.is-push { border-left-color: var(--s-muted); }
+
+.hist-item__icon { flex: 0 0 auto; font-size: 26px; }
+.hist-item__info { flex: 1 1 auto; min-width: 0; }
+.hist-item__game { font-size: 14px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hist-item__meta { font-size: 11px; color: var(--s-muted); }
+
+.hist-item__result { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end; font-variant-numeric: tabular-nums; }
+.hist-item__profit { font-size: 15px; font-weight: 900; }
+.hist-item__bet { font-size: 11px; color: var(--s-muted); }
+.hist-item.is-win .hist-item__profit { color: var(--s-green); }
+.hist-item.is-lose .hist-item__profit { color: var(--s-red); }
+
+.history__more { align-self: center; margin-top: 4px; }
+
+/* Детали раунда (внутри модального окна) */
+.round-details { display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+.round-details__row { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px dashed var(--s-border); }
+.round-details__row:last-child { border-bottom: 0; }
+.round-details__label { color: var(--s-muted); }
+.round-details__value { font-weight: 700; text-align: right; word-break: break-word; }
+
+/* ==========================================================================
+   ЭКРАН ПРАВИЛ
+   ========================================================================== */
+.rules__hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: var(--s-pad);
+  border-radius: var(--s-radius);
+  border: 1px solid var(--s-border);
+  background: radial-gradient(circle at 100% 0%, rgba(168, 85, 247, 0.3), transparent 60%), var(--s-surface);
+}
+
+.rules__hero-icon { font-size: 48px; filter: drop-shadow(0 0 10px rgba(255, 210, 74, 0.5)); }
+.rules__hero-name { margin: 0; font-size: 20px; font-weight: 900; }
+.rules__goal { margin: 4px 0 0; font-size: 14px; line-height: 1.45; color: var(--s-muted); }
+
+.rules__tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin: 0 calc(var(--s-pad) * -1);
+  padding: 0 var(--s-pad);
+}
+
+.rules__tabs::-webkit-scrollbar { display: none; }
+
+.rules__tab {
+  flex: 0 0 auto;
+  min-height: var(--s-tap);
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--s-border);
+  background: var(--s-surface);
+  color: var(--s-muted);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.rules__tab.is-active { color: #2a1a00; border-color: transparent; background: linear-gradient(135deg, var(--s-gold), var(--s-gold-2)); box-shadow: var(--s-glow-gold); }
+
+.rules__block { display: flex; flex-direction: column; gap: 10px; }
+
+/* Шаги «Как играть» */
+.rules__steps { list-style: none; margin: 0; padding: 0; counter-reset: rule-step; display: flex; flex-direction: column; gap: 10px; }
+
+.rules__steps li {
+  position: relative;
+  counter-increment: rule-step;
+  padding: 12px 12px 12px 54px;
+  min-height: 52px;
+  border-radius: var(--s-radius-sm);
+  border: 1px solid var(--s-border);
+  background: var(--s-surface);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.rules__steps li::before {
+  content: counter(rule-step);
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 900;
+  color: #fff;
+  background: linear-gradient(135deg, var(--s-purple), var(--s-purple-2));
+  box-shadow: var(--s-glow-purple);
+}
+
+/* Таблица выплат */
+.rules__payouts { border-radius: var(--s-radius-sm); border: 1px solid var(--s-border); overflow: hidden; background: var(--s-surface); }
+
+.rules__payout-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: var(--s-tap);
+  padding: 8px 14px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--s-border);
+}
+
+.rules__payout-row:last-child { border-bottom: 0; }
+.rules__payout-row:nth-child(even) { background: rgba(255, 255, 255, 0.03); }
+.rules__payout-name { flex: 1 1 auto; min-width: 0; }
+.rules__payout-value { flex: 0 0 auto; font-weight: 900; color: var(--s-gold); font-variant-numeric: tabular-nums; }
+
+/* Советы */
+.rules__tips { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+
+.rules__tips li {
+  padding: 10px 12px 10px 38px;
+  position: relative;
+  border-radius: var(--s-radius-sm);
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid var(--s-border);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.rules__tips li::before { content: "💡"; position: absolute; left: 10px; top: 9px; }
+
+/* FAQ — аккордеон (details/summary, работает без JS и без hover) */
+.faq { display: flex; flex-direction: column; gap: 8px; }
+
+.faq__item { border-radius: var(--s-radius-sm); border: 1px solid var(--s-border); background: var(--s-surface); overflow: hidden; }
+
+.faq__q {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: var(--s-tap);
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.faq__q::-webkit-details-marker { display: none; }
+.faq__q::after { content: "＋"; flex: 0 0 auto; color: var(--s-purple); font-size: 18px; transition: transform 0.2s ease; }
+.faq__item[open] .faq__q::after { content: "−"; color: var(--s-gold); }
+.faq__a { padding: 0 14px 14px; font-size: 14px; line-height: 1.5; color: var(--s-muted); }
+
+/* ==========================================================================
+   БАНК
+   ========================================================================== */
+.bank__balance {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 24px var(--s-pad);
+  text-align: center;
+  border-radius: var(--s-radius);
+  border: 1px solid rgba(255, 210, 74, 0.45);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 210, 74, 0.22), transparent 65%),
+    var(--s-surface);
+  box-shadow: var(--s-glow-gold);
+}
+
+.bank__balance-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--s-muted); }
+.bank__balance-value { font-size: 38px; font-weight: 900; line-height: 1.1; color: var(--s-gold); text-shadow: 0 0 16px rgba(255, 210, 74, 0.6); font-variant-numeric: tabular-nums; word-break: break-all; }
+.bank__balance-note { font-size: 12px; color: var(--s-muted); }
+
+.bank__actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+
+.bank__tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-height: 108px;
+  padding: 14px 10px;
+  border-radius: var(--s-radius);
+  border: 1px solid var(--s-border);
+  background: linear-gradient(170deg, var(--s-surface-2), var(--s-surface));
+  color: var(--s-text);
+  text-align: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.bank__tile:active { transform: scale(0.96); border-color: var(--s-purple); }
+.bank__tile.is-disabled { opacity: 0.5; pointer-events: none; }
+.bank__tile-icon { font-size: 30px; }
+.bank__tile-title { font-size: 14px; font-weight: 800; }
+.bank__tile-sub { font-size: 11px; color: var(--s-muted); line-height: 1.3; }
+.bank__tile-timer { font-size: 12px; font-weight: 700; color: var(--s-gold); font-variant-numeric: tabular-nums; }
+
+.bank__ops { display: flex; flex-direction: column; gap: 8px; }
+
+.bank__op {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--s-tap);
+  padding: 8px 12px;
+  border-radius: var(--s-radius-sm);
+  border: 1px solid var(--s-border);
+  background: var(--s-surface);
+}
+
+.bank__op-icon { flex: 0 0 auto; font-size: 22px; }
+.bank__op-info { flex: 1 1 auto; min-width: 0; }
+.bank__op-reason { font-size: 14px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bank__op-time { font-size: 11px; color: var(--s-muted); }
+.bank__op-amount { flex: 0 0 auto; font-size: 15px; font-weight: 900; font-variant-numeric: tabular-nums; }
+.bank__op-amount.is-plus { color: var(--s-green); }
+.bank__op-amount.is-minus { color: var(--s-red); }
+
+.bank__disclaimer {
+  padding: 12px 14px;
+  border-radius: var(--s-radius-sm);
+  border: 1px dashed var(--s-border);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--s-muted);
+  text-align: center;
+}
+
+/* ==========================================================================
+   НАСТРОЙКИ
+   ========================================================================== */
+.settings__group { display: flex; flex-direction: column; border-radius: var(--s-radius); border: 1px solid var(--s-border); background: var(--s-surface); overflow: hidden; }
+
+.settings__group-title { margin: 0; padding: 12px 16px 6px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: var(--s-purple); }
+
+.settings__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--s-border);
+}
+
+.settings__group-title + .settings__row { border-top: 0; }
+.settings__label { flex: 1 1 auto; min-width: 0; font-size: 15px; font-weight: 600; }
+.settings__hint { display: block; margin-top: 2px; font-size: 12px; font-weight: 400; color: var(--s-muted); line-height: 1.35; }
+.settings__row--stack { flex-direction: column; align-items: stretch; }
+
+/* Переключатель (toggle) */
+.switch {
+  position: relative;
+  flex: 0 0 auto;
+  width: 56px;
+  height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Увеличиваем зону касания до 44px по высоте */
+.switch::before { content: ""; position: absolute; inset: -6px -4px; }
+
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease;
+}
+
+.switch.is-on { background: linear-gradient(135deg, var(--s-purple), var(--s-purple-2)); box-shadow: var(--s-glow-purple); }
+.switch.is-on::after { transform: translateX(24px); }
+.switch:focus-visible { outline: 2px solid var(--s-gold); outline-offset: 3px; }
+
+/* Ползунок громкости */
+.slider-row { display: flex; align-items: center; gap: 12px; width: 100%; }
+.slider-row__icon { flex: 0 0 auto; font-size: 20px; }
+.slider-row__value { flex: 0 0 auto; min-width: 40px; text-align: right; font-size: 13px; font-weight: 700; color: var(--s-gold); font-variant-numeric: tabular-nums; }
+
+.slider {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: var(--s-tap);
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  touch-action: pan-y;
+}
+
+.slider::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--s-purple), var(--s-gold)); }
+.slider::-moz-range-track { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--s-purple), var(--s-gold)); }
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -11px;
+  border-radius: 50%;
+  border: 2px solid var(--s-gold);
+  background: var(--s-bg);
+  box-shadow: var(--s-glow-gold);
+}
+
+.slider::-moz-range-thumb { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--s-gold); background: var(--s-bg); box-shadow: var(--s-glow-gold); }
+
+/* Сегментированный выбор (например, скорость анимаций) */
+.settings__segments { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; border-radius: var(--s-radius-sm); background: var(--s-bg); border: 1px solid var(--s-border); width: 100%; }
+
+.settings__segment { min-height: 40px; border: 0; border-radius: 9px; background: transparent; color: var(--s-muted); font-size: 14px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+.settings__segment.is-active { background: linear-gradient(135deg, var(--s-purple), var(--s-purple-2)); color: #fff; }
+
+/* Опасная зона */
+.settings__danger { border-color: rgba(255, 77, 109, 0.4); }
+.settings__danger .settings__group-title { color: var(--s-red); }
+
+.settings__textarea {
+  width: 100%;
+  min-height: 110px;
+  padding: 12px;
+  border-radius: var(--s-radius-sm);
+  border: 1px solid var(--s-border);
+  background: var(--s-bg);
+  color: var(--s-text);
+  font: 12px/1.4 ui-monospace, Menlo, Consolas, monospace;
+  resize: vertical;
+  outline: none;
+}
+
+.settings__textarea:focus { border-color: var(--s-purple); }
+.settings__version { padding: 8px 0; text-align: center; font-size: 12px; color: var(--s-muted); }
+
+/* ==========================================================================
+   АДАПТАЦИЯ
+   ========================================================================== */
+/* Очень узкие экраны */
+@media (max-width: 359px) {
+  .screen { --s-pad: 12px; }
+  .scr-title { font-size: 19px; }
+  .lobby__balance { font-size: 22px; }
+  .bank__balance-value { font-size: 30px; }
+  .avatar-picker { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Широкие экраны / планшеты */
+@media (min-width: 480px) {
+  .catalog__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .stat-card--wide { grid-column: auto; }
+}
+
+/* Горизонтальная ориентация — проект портретный, но экран не должен ломаться */
+@media (orientation: landscape) and (max-height: 480px) {
+  .screen { padding-bottom: calc(var(--s-pad) + 60px + env(safe-area-inset-bottom, 0px)); }
+  .chart-box__canvas-wrap { height: 140px; }
+}
+
+/* Уважение к настройке «уменьшить анимацию» */
+@media (prefers-reduced-motion: reduce) {
+  .screen,
+  .daily__icon,
+  .daily.is-ready,
+  .scr-progress__bar,
+  .switch,
+  .switch::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Класс, который включает настройка «Без анимаций» */
+.no-anim .screen,
+.no-anim .daily__icon,
+.no-anim .daily.is-ready,
+.no-anim .scr-progress__bar,
+.no-anim .switch,
+.no-anim .switch::after {
+  animation: none !important;
+  transition: none !important;
+}
