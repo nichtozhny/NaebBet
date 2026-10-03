@@ -84,7 +84,7 @@
     st.id = STYLE_ID;
     st.textContent =
       '.nb-screen-host{position:relative;overflow-x:hidden;}' +
-      '.nb-screen{width:100%;min-height:100%;box-sizing:border-box;}' +
+      '.nb-view{width:100%;min-height:100%;box-sizing:border-box;}' +
       '.nb-screen-error{display:flex;flex-direction:column;align-items:center;justify-content:center;' +
       'gap:14px;padding:32px 20px;text-align:center;color:#e8e0ff;min-height:60vh;}' +
       '.nb-screen-error .nb-err-icon{font-size:56px;}' +
@@ -270,7 +270,7 @@
 
     // Новая обёртка экрана
     var wrapper = document.createElement('div');
-    wrapper.className = 'nb-screen';
+    wrapper.className = 'nb-view';
     wrapper.setAttribute('data-screen-id', entry.id);
 
     if (prev && prev.wrapper) animateOut(prev.wrapper, direction);
