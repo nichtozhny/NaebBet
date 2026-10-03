@@ -88,26 +88,22 @@
 
     <!-- Нижняя навигация: плавающая (position:absolute), экран резервирует под неё место -->
     <nav id="nav" class="nav nb-nav" aria-label="Основная навигация">
-      <button type="button" class="nav__item is-active" data-screen="lobby" aria-label="Лобби">
-        <span class="nav__icon" aria-hidden="true">🏠</span>
-        <span class="nav__text">Лобби</span>
-      </button>
-      <button type="button" class="nav__item" data-screen="games" aria-label="Игры">
-        <span class="nav__icon" aria-hidden="true">🎲</span>
-        <span class="nav__text">Игры</span>
-      </button>
-      <button type="button" class="nav__item" data-screen="profile" aria-label="Профиль">
-        <span class="nav__icon" aria-hidden="true">👤</span>
-        <span class="nav__text">Профиль</span>
-      </button>
-      <button type="button" class="nav__item" data-screen="bank" aria-label="Банк">
-        <span class="nav__icon" aria-hidden="true">🏦</span>
-        <span class="nav__text">Банк</span>
-      </button>
-      <button type="button" class="nav__item" data-screen="more" aria-label="Ещё">
-        <span class="nav__icon" aria-hidden="true">☰</span>
-        <span class="nav__text">Ещё</span>
-      </button>
+  <button type="button" class="nav__item is-active" data-screen="lobby" aria-label="Игры">
+    <span class="nav__icon" aria-hidden="true">🎰</span>
+    <span class="nav__text">Игры</span>
+  </button>
+  <button type="button" class="nav__item" data-screen="stats" aria-label="Статистика">
+    <span class="nav__icon" aria-hidden="true">📊</span>
+    <span class="nav__text">Статистика</span>
+  </button>
+  <button type="button" class="nav__item" data-screen="achievements" aria-label="Награды">
+    <span class="nav__icon" aria-hidden="true">🏆</span>
+    <span class="nav__text">Награды</span>
+  </button>
+  <button type="button" class="nav__item" data-screen="settings" aria-label="Ещё">
+    <span class="nav__icon" aria-hidden="true">⚙️</span>
+    <span class="nav__text">Ещё</span>
+  </button>
     </nav>
   </div>
 
@@ -186,7 +182,7 @@
 
     // Регистрация service worker для офлайн-работы
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function () {
+      window.addEscreenstener('load', function () {
         navigator.serviceWorker.register('sw.js').then(function (reg) {
           // Сообщаем приложению о готовности офлайн-режима, если NB.Events уже доступен
           if (window.NB && NB.Events && typeof NB.Events.emit === 'function') {
