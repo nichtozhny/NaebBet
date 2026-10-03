@@ -98,7 +98,7 @@
   // Поиск (или создание) контейнера для экранов
   function getContainer() {
     if (container && document.body.contains(container)) return container;
-    var sels = ['#nb-screen', '#screen-container', '#app-screen', '#app', 'main'];
+    var sels = ['#screen', '#nb-screen', '#screen-container', '#app-screen', 'main', '#app'];
     var el = null;
     for (var i = 0; i < sels.length && !el; i++) el = document.querySelector(sels[i]);
     if (!el) {
