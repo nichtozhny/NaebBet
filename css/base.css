@@ -1039,3 +1039,21 @@ strong, b { font-weight: 700; color: var(--nb-text); }
     scroll-behavior: auto !important;
   }
 }
+html, body {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  position: static !important;
+  touch-action: pan-y !important;
+}
+
+#app, main, #screen, .screen, .app, .content {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+body {
+  padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)) !important;
+}
