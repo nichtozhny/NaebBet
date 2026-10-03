@@ -850,3 +850,26 @@ strong, b { font-weight: 700; color: var(--nb-text); }
     scroll-behavior: auto !important;
   }
 }
+html, body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+#app {                       /* общая обёртка, если есть; если нет, строку можно убрать */
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+#screen {                    /* контейнер, куда рисуются экраны */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); /* чтобы нижнее меню не закрывало конец списка */
+}
+
+canvas { touch-action: none; } /* блокировка жестов только на игровых canvas */
