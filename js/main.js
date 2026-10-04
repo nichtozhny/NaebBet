@@ -297,7 +297,8 @@
     '.nb-m-rules ul.pay b{color:var(--m-accent2);white-space:nowrap}',
     '.nb-m-rules details{border-bottom:1px solid rgba(255,255,255,.07)}',
     '.nb-m-rules details summary{min-height:44px;display:flex;align-items:center;font-weight:700;cursor:pointer}',
-    '.nb-m-ov{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px;',
+    '.nb-m-nav{display:none!important}',
+    '.nb-m-ov{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:16px;',
     'box-sizing:border-box;background:rgba(5,2,12,.78);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);animation:nbmFade .2s}',
     '.nb-m-ov.out{opacity:0;transition:opacity .2s}',
     '.nb-m-dlg{width:100%;max-width:420px;max-height:88vh;max-height:88dvh;display:flex;flex-direction:column;box-sizing:border-box;',
@@ -324,7 +325,7 @@
     '.nb-m-spl-bar{width:60%;max-width:260px;height:6px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden;margin-top:18px}',
     '.nb-m-spl-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#b46bff,#ffcf4a);transition:width .3s}',
     '.nb-m-spl-msg{font-size:12px;color:var(--m-dim);min-height:16px}',
-    '.nb-m-pause{position:fixed;inset:0;z-index:10001;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;',
+    '.nb-m-pause{position:fixed;inset:0;z-index:100001;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;',
     'background:rgba(5,2,12,.88);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);text-align:center;padding:24px;cursor:pointer}',
     '.nb-m-pause .ic{font-size:64px}.nb-m-pause b{font-size:24px}.nb-m-pause span{color:var(--m-dim)}',
     '.nb-m-fatal{padding:24px;text-align:center;color:var(--m-text)}',
@@ -888,7 +889,7 @@
     reset.type = 'button';
     ctx.listen(reset, 'click', function () {
       sfx('click');
-      NB.UI.confirm('Удалить всю статистику? Баланс и уровень не изменятся.').then(function (ok) {
+      askConfirm('Удалить всю статистику? Баланс и уровень не изменятся.', 'Удалить').then(function (ok) {
         if (!ok) return;
         safe(function () { NB.Stats.reset(); });
         toast('Статистика сброшена', 'success');
@@ -958,11 +959,67 @@
     setTimeout(function () { URL.revokeObjectURL(url); }, 3000);
   }
 
+
+  /* ------------------------------------------------------------------------
+   * Подтверждение и работа с сохранением (не зависят от NB.UI.confirm)
+   * ---------------------------------------------------------------------- */
+  function askConfirm(text, okText) {
+    var api = openDialog({
+      title: 'Подтверждение',
+      html: '<p>' + esc(text) + '</p>',
+      dismissible: true,
+      buttons: [
+        { text: 'Отмена', kind: 'ghost', value: false },
+        { text: okText || 'Да', kind: 'danger', value: true }
+      ]
+    });
+    return api.promise.then(function (v) { return v === true; });
+  }
+
+  function lsKeys() {
+    var keys = [];
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && k.indexOf('nb_') === 0) keys.push(k);
+      }
+    } catch (e) { /* localStorage недоступен */ }
+    return keys;
+  }
+
+  function exportText() {
+    try {
+      var data = NB.Storage.exportAll();
+      var t = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+      if (t && t.length > 2) return t;
+    } catch (e) { warn('exportAll не сработал, делаем копию напрямую', e); }
+    var items = {};
+    lsKeys().forEach(function (k) { items[k] = localStorage.getItem(k); });
+    return JSON.stringify({ __nb_raw: 1, items: items }, null, 2);
+  }
+
+  function importText(txt) {
+    var parsed = null;
+    try { parsed = JSON.parse(txt); } catch (e) { throw new Error('это не JSON-текст сохранения'); }
+    if (parsed && parsed.__nb_raw === 1 && parsed.items && typeof parsed.items === 'object') {
+      lsKeys().forEach(function (k) { localStorage.removeItem(k); });
+      Object.keys(parsed.items).forEach(function (k) {
+        if (k.indexOf('nb_') === 0) localStorage.setItem(k, String(parsed.items[k]));
+      });
+      return;
+    }
+    NB.Storage.importAll(txt);
+  }
+
+  function resetEverything() {
+    try { NB.Storage.resetAll(); } catch (e) { warn('resetAll не сработал', e); }
+    lsKeys().forEach(function (k) { try { localStorage.removeItem(k); } catch (e) { /* игнор */ } });
+  }
+
   function openExport() {
     var text;
     try {
-      var data = NB.Storage.exportAll();
-      text = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+      text = exportText();
     } catch (e) {
       toast('Не удалось подготовить экспорт', 'error');
       return;
@@ -1016,10 +1073,10 @@
         { text: 'Импортировать', kind: 'primary', keep: true, onClick: function (api) {
           var txt = api.el.querySelector('textarea').value.trim();
           if (!txt) { toast('Вставь данные или выбери файл', 'error'); sfx('error'); return false; }
-          NB.UI.confirm('Заменить текущий прогресс импортируемым?').then(function (ok) {
+          askConfirm('Заменить текущий прогресс импортируемым?', 'Заменить').then(function (ok) {
             if (!ok) return;
             try {
-              NB.Storage.importAll(txt);
+              importText(txt);
               api.close(true);
               toast('Импорт выполнен, перезапуск…', 'success');
               setTimeout(function () { location.reload(); }, 900);
@@ -1105,17 +1162,22 @@
       if (!b) return;
       sfx('click');
       var a = b.getAttribute('data-a');
+      try {
       if (a === 'rules') NB.Router.go('rules');
       else if (a === 'tour') runTour();
       else if (a === 'exp') openExport();
       else if (a === 'imp') openImport();
       else if (a === 'reset') {
-        NB.UI.confirm('Удалить весь прогресс, статистику и вернуть стартовые монеты? Это нельзя отменить.').then(function (ok) {
+        askConfirm('Удалить весь прогресс, статистику и вернуть стартовые монеты? Это нельзя отменить.', 'Сбросить').then(function (ok) {
           if (!ok) return;
-          try { NB.Storage.resetAll(); } catch (er) { toast('Не удалось сбросить данные', 'error'); return; }
+          try { resetEverything(); } catch (er) { toast('Не удалось сбросить данные', 'error'); return; }
           toast('Данные сброшены, перезапуск…', 'success');
           setTimeout(function () { location.reload(); }, 900);
         });
+      }
+      } catch (err) {
+        console.error('[NB.Main] Ошибка кнопки', a, err);
+        toast('Ошибка: ' + (err && err.message ? err.message : err), 'error');
       }
     });
     body.appendChild(cd);
