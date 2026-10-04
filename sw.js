@@ -17,7 +17,7 @@
 'use strict';
 
 // Версия кэша — менять при каждом релизе
-const CACHE_VERSION = 'v8';
+const CACHE_VERSION = 'v9';
 
 // Префикс нужен, чтобы удалять только свои старые кэши
 const CACHE_PREFIX = 'naebbet-';
